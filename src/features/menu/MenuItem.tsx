@@ -1,5 +1,8 @@
-function MenuItem({ pizza }) {
-  const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
+import type { Pizza } from '../../types';
+import { formatCurrency } from '../../utils/helpers';
+
+function MenuItem({ pizza }: { pizza: Pizza }) {
+  const { name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
 
   return (
     <li>
