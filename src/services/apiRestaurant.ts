@@ -1,4 +1,4 @@
-import type { Pizza } from '../types';
+import type { ICreateOrder, Order, Pizza } from '../types';
 
 const API_URL = 'https://react-fast-pizza-api.jonas.io/api';
 
@@ -12,7 +12,7 @@ export async function getMenu(): Promise<Pizza[]> {
   return data;
 }
 
-export async function getOrder(id) {
+export async function getOrder(id: string): Promise<Order> {
   const res = await fetch(`${API_URL}/order/${id}`);
   if (!res.ok) throw Error(`Couldn't find order #${id}`);
 
@@ -20,7 +20,7 @@ export async function getOrder(id) {
   return data;
 }
 
-export async function createOrder(newOrder) {
+export async function createOrder(newOrder: ICreateOrder) {
   try {
     const res = await fetch(`${API_URL}/order`, {
       method: 'POST',
