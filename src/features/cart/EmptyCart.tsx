@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
-
+import { Link } from "react-router-dom";
+const ss = "ww";
+const w = "s";
 function EmptyCart() {
   return (
     <div>
