@@ -6,11 +6,13 @@ function Button({
   type,
   to,
   disabled,
+  onClick,
 }: {
   children: React.ReactNode;
   type: 'primary' | 'secondary' | 'small';
   to?: string;
   disabled?: boolean;
+  onClick?: () => void;
 }) {
   const base =
     'inline-block text-sm cursor-pointer rounded-full bg-yellow-400 font-semibold tracking-wide text-stone-800 uppercase transition-colors duration-300 hover:bg-yellow-300 focus:bg-yellow-300 focus:ring focus:ring-yellow-300 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed';
@@ -27,6 +29,14 @@ function Button({
       <Link className={styles[type]} to={to}>
         {children}
       </Link>
+    );
+  }
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} disabled={disabled} className={styles[type]}>
+        {children}
+      </button>
     );
   }
 

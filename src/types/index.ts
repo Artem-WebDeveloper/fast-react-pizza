@@ -29,7 +29,7 @@ export interface ICreateOrder {
   cart: Cart[];
 }
 
-interface Cart {
+export interface Cart {
   pizzaId: number;
   name: string;
   quantity: number;

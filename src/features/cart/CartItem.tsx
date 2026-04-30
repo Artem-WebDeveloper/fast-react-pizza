@@ -1,8 +1,12 @@
+import { useAppDispath } from '../../store';
+import type { Cart } from '../../types';
 import Button from '../../ui/Button';
 import { formatCurrency } from '../../utils/helpers';
+import { deleteItem } from './cartSlice';
 
-function CartItem({ item }) {
+function CartItem({ item }: { item: Cart }) {
   const { pizzaId, name, quantity, totalPrice } = item;
+  const dispatch = useAppDispath();
 
   return (
     <li className="py-3 sm:flex sm:items-center sm:justify-between">
@@ -11,7 +15,9 @@ function CartItem({ item }) {
       </p>
       <div className="flex items-center justify-between sm:gap-6">
         <p className="text-sm font-bold">{formatCurrency(totalPrice)}</p>
-        <Button type="small">Delete</Button>
+        <Button type="small" onClick={() => dispatch(deleteItem(pizzaId))}>
+          Delete
+        </Button>
       </div>
     </li>
   );
