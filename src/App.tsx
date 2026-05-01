@@ -1,12 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import Home from './ui/Home';
-import Menu from './features/menu/Menu';
-import Cart from './features/cart/Cart';
-import Error from './ui/Error';
-import CreateOrder from './features/order/CreateOrder';
-import Order from './features/order/Order';
 import AppLayout from './ui/AppLayout';
+import Error from './ui/Error';
 
 import { menuLoader } from './features/menu/menuLoader';
 import orderLoader from './features/order/orderLoader';
@@ -20,26 +15,42 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Home />,
+        lazy: async () => {
+          const { default: Component } = await import('./ui/Home');
+          return { Component };
+        },
       },
       {
         path: '/menu',
-        element: <Menu />,
+        lazy: async () => {
+          const { default: Component } = await import('./features/menu/Menu');
+          return { Component };
+        },
         loader: menuLoader,
         errorElement: <Error />,
       },
       {
         path: '/cart',
-        element: <Cart />,
+        lazy: async () => {
+          const { default: Component } = await import('./features/cart/Cart');
+          return { Component };
+        },
       },
       {
         path: '/order/new',
-        element: <CreateOrder />,
+        lazy: async () => {
+          const { default: Component } =
+            await import('./features/order/CreateOrder');
+          return { Component };
+        },
         action: actionCreateOrder,
       },
       {
         path: '/order/:orderId',
-        element: <Order />,
+        lazy: async () => {
+          const { default: Component } = await import('./features/order/Order');
+          return { Component };
+        },
         loader: orderLoader,
         errorElement: <Error />,
         action: updateActionOrder,
