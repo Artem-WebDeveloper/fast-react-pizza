@@ -27,6 +27,7 @@ export interface ICreateOrder {
   address: string;
   priority: boolean;
   cart: Cart[];
+  position: string;
 }
 
 export interface Cart {
@@ -36,3 +37,8 @@ export interface Cart {
   unitPrice: number;
   totalPrice: number;
 }
+
+export type Coords = {
+  latitude: number;
+  longitude: number;
+};

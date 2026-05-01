@@ -2,42 +2,40 @@
 import { Form, useActionData, useNavigation } from 'react-router-dom';
 import type createActionOrder from './createOrderAction';
 import Button from '../../ui/Button';
-import { useAppSelector } from '../../store';
-
-const fakeCart = [
-  {
-    pizzaId: 12,
-    name: 'Mediterranean',
-    quantity: 2,
-    unitPrice: 16,
-    totalPrice: 32,
-  },
-  {
-    pizzaId: 6,
-    name: 'Vegetale',
-    quantity: 1,
-    unitPrice: 13,
-    totalPrice: 13,
-  },
-  {
-    pizzaId: 11,
-    name: 'Spinach and Mushroom',
-    quantity: 1,
-    unitPrice: 15,
-    totalPrice: 15,
-  },
-];
+import { useAppDispath, useAppSelector } from '../../store';
+import { getCart, getTotalCartPrice } from '../cart/cartSlice';
+import EmptyCart from '../cart/EmptyCart';
+import { formatCurrency } from '../../utils/helpers';
+import { useState } from 'react';
+import { fetchAddress } from '../user/userSlice';
 
 function CreateOrder() {
-  // const [withPriority, setWithPriority] = useState(false);
-  const username = useAppSelector((state) => state.user.username);
+  const [withPriority, setWithPriority] = useState(false);
+  const {
+    username,
+    status: addressStatus,
+    error: addressError,
+    position,
+    address,
+  } = useAppSelector((state) => state.user);
+
+  const isLoadingAddress = addressStatus === 'loading';
+
+  const dispatch = useAppDispath();
 
   const navigation = useNavigation();
   const isSubmiting = navigation.state === 'submitting';
 
   const formErrors = useActionData<typeof createActionOrder>();
 
-  const cart = fakeCart;
+  const cart = useAppSelector(getCart);
+
+  //! Приоритет заказа +20% к общей стоимости
+  const totalCartPrice = useAppSelector(getTotalCartPrice);
+  const priorityPrice = withPriority ? totalCartPrice * 0.2 : 0;
+  const totalPrice = totalCartPrice + priorityPrice;
+
+  if (!cart.length) return <EmptyCart />;
 
   return (
     <div className="px-4 py-6">
@@ -68,16 +66,37 @@ function CreateOrder() {
           </div>
         </div>
 
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
           <label className="sm:basis-40">Address</label>
           <div className="grow">
             <input
               className="input w-full"
               type="text"
               name="address"
+              disabled={isLoadingAddress}
+              defaultValue={address}
               required
             />
+            {addressStatus === 'error' && (
+              <p className="mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700">
+                {addressError}
+              </p>
+            )}
           </div>
+          {!position?.latitude && !position?.longitude && (
+            <span className="absolute top-0.75 right-0.75 z-40 md:top-1.25 md:right-1.25">
+              <Button
+                disabled={isLoadingAddress}
+                type="small"
+                onClick={(e) => {
+                  e.preventDefault();
+                  dispatch(fetchAddress());
+                }}
+              >
+                Get Position
+              </Button>
+            </span>
+          )}
         </div>
 
         <div className="mb-12 flex items-center gap-5">
@@ -86,8 +105,9 @@ function CreateOrder() {
             type="checkbox"
             name="priority"
             id="priority"
-            // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
+            value={'true'}
+            checked={withPriority}
+            onChange={(e) => setWithPriority(e.target.checked)}
           />
           <label className="font-medium" htmlFor="priority">
             Want to yo give your order priority?
@@ -97,8 +117,19 @@ function CreateOrder() {
         <div>
           {/* Удобный Способ отправки данных формой из React-Router */}
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <Button disabled={isSubmiting} type="primary">
-            {isSubmiting ? 'Placing order...' : 'Order now'}
+          <input
+            type="hidden"
+            name="position"
+            value={
+              position?.longitude && position?.latitude
+                ? `${position?.latitude}, ${position?.longitude}`
+                : ''
+            }
+          />
+          <Button disabled={isSubmiting || isLoadingAddress} type="primary">
+            {isSubmiting
+              ? 'Placing order...'
+              : `Order now from ${formatCurrency(totalPrice)}`}
           </Button>
         </div>
       </Form>

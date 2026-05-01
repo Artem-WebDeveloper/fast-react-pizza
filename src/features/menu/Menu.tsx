@@ -6,8 +6,6 @@ import type { LoaderMenu } from './menuLoader';
 function Menu() {
   const menu = useLoaderData<LoaderMenu>();
 
-  console.log(menu);
-
   return (
     <ul className="divide-y divide-stone-200 px-2">
       {menu.map((pizza) => (

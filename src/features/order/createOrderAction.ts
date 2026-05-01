@@ -2,18 +2,23 @@ import { redirect, type ActionFunctionArgs } from 'react-router-dom';
 import { createOrder } from '../../services/apiRestaurant';
 import type { ICreateOrder } from '../../types';
 import { isValidPhone } from '../../utils/helpers';
+import store from '../../store';
+import { clearCart } from '../cart/cartSlice';
 
 function parseOrderFormData(formData: FormData): ICreateOrder {
   return {
     customer: String(formData.get('customer')),
     phone: String(formData.get('phone')),
     address: String(formData.get('address')),
-    priority: formData.get('priority') === 'on',
+    priority: formData.get('priority') === 'true',
     cart: JSON.parse(String(formData.get('cart'))),
+    position: String(formData.get('position')),
   };
 }
 
-export default async function createActionOrder({ request }: ActionFunctionArgs) {
+export default async function createActionOrder({
+  request,
+}: ActionFunctionArgs) {
   // получаем данные из формы
   const formData = await request.formData();
 
@@ -24,13 +29,19 @@ export default async function createActionOrder({ request }: ActionFunctionArgs)
   let errors: null | Record<string, string> = null;
   // Проверяем
   if (!isValidPhone(order.phone)) {
-    errors = { phone: 'Please give us your correct number. We might need if to contact you.' };
+    errors = {
+      phone:
+        'Please give us your correct number. We might need if to contact you.',
+    };
   }
   // Возвращаем если ошибки не null
   if (errors) return errors;
 
   // Отправляем заказ, если все ок
   const newOrder = await createOrder(order);
+
+  //! Не злоупотреблять
+  store.dispatch(clearCart());
 
   // Редиректим на страницу созданного заказа
   return redirect(`/order/${newOrder.id}`);

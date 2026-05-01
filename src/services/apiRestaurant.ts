@@ -38,7 +38,7 @@ export async function createOrder(newOrder: ICreateOrder) {
   }
 }
 
-export async function updateOrder(id, updateObj) {
+export async function updateOrder(id: string, updateObj: Partial<Order>) {
   try {
     const res = await fetch(`${API_URL}/order/${id}`, {
       method: 'PATCH',
@@ -50,7 +50,7 @@ export async function updateOrder(id, updateObj) {
 
     if (!res.ok) throw Error();
     // We don't need the data, so we don't return anything
-  } catch (err) {
+  } catch {
     throw Error('Failed updating your order');
   }
 }
